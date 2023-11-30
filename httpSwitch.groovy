@@ -2,7 +2,7 @@
  * Http Switch
  *
  * Calls URIs with HTTP GET for switch on or off
- * 
+ *
  */
 metadata {
     definition(name: "Http Switch", namespace: "joelwetzel", author: "Joel Wetzel") {
@@ -86,9 +86,15 @@ def refresh() {
 
     try {
         httpGet(settings.refreshURI) { resp ->
-            if (resp.success) {
-              // TODO - parse the response and send the correct event
-                sendEvent(name: "switch", value: "off", isStateChange: true)
+            if (resp && resp.status == 200) {
+              // Parse the response and send the correct event
+
+              def result = resp.data
+              if (result == "true") {
+                  sendEvent(name: "switch", value: "on", isStateChange: true)
+              } else {
+                  sendEvent(name: "switch", value: "off", isStateChange: true)
+              }
             }
             if (logEnable) {
                 if (resp.data) {

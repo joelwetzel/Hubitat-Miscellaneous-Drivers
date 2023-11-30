@@ -22,35 +22,23 @@ preferences {
     }
 }
 
-public enum ConstNames {
+def cLOGENABLE() { 'logEnable' }
+def cSWITCH() { 'switch' }
 
-    LOGENABLE('logEnable'),
-    SWITCH('switch')
+def cTRUE() { 'true' }
+def cFALSE() { 'false' }
+def cON() { 'on' }
+def cOFF() { 'off' }
 
-}
-
-public enum ConstValues {
-
-    TRUE('true'),
-    FALSE('false'),
-    ON('on'),
-    OFF('off')
-
-}
-
-public enum ConstTypes {
-
-    BOOL('bool'),
-    STRING('string')
-
-}
+def cBOOL() { 'bool' }
 
 def logsOff() {
     log.warn 'debug logging disabled...'
-    device.updateSetting(ConstNames.LOGENABLE, [value: ConstValues.FALSE, type: ConstTypes.BOOL])
+    device.updateSetting(cLOGENABLE(), [value: cFALSE(), type: cBOOL()])
 }
 
 def updated() {
+    log.info cLOGENABLE()
     log.info 'updated...'
     log.warn "debug logging is: ${logEnable == true}"
     if (logEnable) {
@@ -72,7 +60,7 @@ def on() {
     try {
         httpGet(settings.onURI) { resp ->
             if (resp.success) {
-                sendEvent(name: ConstNames.SWITCH, value: ConstValues.ON, isStateChange: true)
+                sendEvent(name: cSWITCH(), value: cON(), isStateChange: true)
             }
             if (logEnable) {
                 if (resp.data) {
@@ -93,7 +81,7 @@ def off() {
     try {
         httpGet(settings.offURI) { resp ->
             if (resp.success) {
-                sendEvent(name: ConstNames.SWITCH, value: ConstValues.OFF, isStateChange: true)
+                sendEvent(name: cSWITCH(), value: cOFF(), isStateChange: true)
             }
             if (logEnable) {
                 if (resp.data) {
@@ -116,10 +104,10 @@ def refresh() {
             if (resp && resp.status == 200) {
               // Parse the response and send the correct event
 
-                if (resp.data == ConstValues.TRUE) {
-                    sendEvent(name: ConstNames.SWITCH, value: ConstValues.ON, isStateChange: true)
+                if (resp.data == cTRUE()) {
+                    sendEvent(name: cSWITCH(), value: cON(), isStateChange: true)
               } else {
-                    sendEvent(name: ConstNames.SWITCH, value: ConstValues.OFF, isStateChange: true)
+                    sendEvent(name: cSWITCH(), value: cOFF(), isStateChange: true)
                 }
             }
             if (logEnable) {

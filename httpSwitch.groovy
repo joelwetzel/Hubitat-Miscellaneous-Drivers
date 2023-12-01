@@ -22,6 +22,8 @@ preferences {
     }
 }
 
+import groovy.transform.Field
+
 @Field String cLOGENABLE = 'logEnable'
 @Field String cSWITCH = 'switch'
 

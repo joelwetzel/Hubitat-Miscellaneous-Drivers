@@ -22,23 +22,23 @@ preferences {
     }
 }
 
-def cLOGENABLE() { 'logEnable' }
-def cSWITCH() { 'switch' }
+@Field String cLOGENABLE = 'logEnable'
+@Field String cSWITCH = 'switch'
 
-def cTRUE() { 'true' }
-def cFALSE() { 'false' }
-def cON() { 'on' }
-def cOFF() { 'off' }
+@Field String cTRUE = 'true'
+@Field String cFALSE = 'false'
+@Field String cON = 'on'
+@Field String cOFF = 'off'
 
-def cBOOL() { 'bool' }
+@Field String cBOOL = 'bool'
 
 def logsOff() {
     log.warn 'debug logging disabled...'
-    device.updateSetting(cLOGENABLE(), [value: cFALSE(), type: cBOOL()])
+    device.updateSetting(cLOGENABLE, [value: cFALSE, type: cBOOL])
 }
 
 def updated() {
-    log.info cLOGENABLE()
+    log.info cLOGENABLE
     log.info 'updated...'
     log.warn "debug logging is: ${logEnable == true}"
     if (logEnable) {
@@ -60,7 +60,7 @@ def on() {
     try {
         httpGet(settings.onURI) { resp ->
             if (resp.success) {
-                sendEvent(name: cSWITCH(), value: cON(), isStateChange: true)
+                sendEvent(name: cSWITCH, value: cON, isStateChange: true)
             }
             if (logEnable) {
                 if (resp.data) {
@@ -81,7 +81,7 @@ def off() {
     try {
         httpGet(settings.offURI) { resp ->
             if (resp.success) {
-                sendEvent(name: cSWITCH(), value: cOFF(), isStateChange: true)
+                sendEvent(name: cSWITCH, value: cOFF, isStateChange: true)
             }
             if (logEnable) {
                 if (resp.data) {
@@ -104,10 +104,10 @@ def refresh() {
             if (resp && resp.status == 200) {
               // Parse the response and send the correct event
 
-                if (resp.data == cTRUE()) {
-                    sendEvent(name: cSWITCH(), value: cON(), isStateChange: true)
+                if (resp.data == cTRUE) {
+                    sendEvent(name: cSWITCH, value: cON, isStateChange: true)
               } else {
-                    sendEvent(name: cSWITCH(), value: cOFF(), isStateChange: true)
+                    sendEvent(name: cSWITCH, value: cOFF, isStateChange: true)
                 }
             }
             if (logEnable) {

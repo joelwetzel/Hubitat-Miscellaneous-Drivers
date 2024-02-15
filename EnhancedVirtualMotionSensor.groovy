@@ -14,21 +14,25 @@
  *
  */
 
-	
+
 metadata {
-	definition (name: "Enhanced Virtual Motion Sensor", namespace: "joelwetzel", author: "Joel Wetzel", description: "A virtual motion sensor that also behaves as a switch.  For use with Alexa and HomeKit.") {
+	definition (name: "Enhanced Virtual Motion Sensor", namespace: "joelwetzel", author: "Joel Wetzel") {
 		capability "Refresh"
 		capability "Sensor"
 		capability "Motion Sensor"
-		
+
 		capability "Actuator"
 		capability "Switch"
-		
+
 		command "active"
 		command "inactive"
 	}
 }
 
+def parse(String description) {
+	def pair = description.split(":")
+	createEvent(name: pair[0].trim(), value: pair[1].trim())
+}
 
 def installed () {
 	log.info "${device.displayName}.installed()"
@@ -65,7 +69,3 @@ def off() {
 	sendEvent(name: "switch", value: "off")
     sendEvent(name: "motion", value: "inactive")
 }
-
-
-
-

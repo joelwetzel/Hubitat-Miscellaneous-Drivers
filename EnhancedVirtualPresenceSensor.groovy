@@ -20,7 +20,7 @@ metadata {
         capability "Switch"
         capability "PresenceSensor"
 		capability "Sensor"
-        
+
 		command "arrived"
 		command "departed"
     }

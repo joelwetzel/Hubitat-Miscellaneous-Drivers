@@ -14,29 +14,27 @@
  *
  */
 
-	
+
 metadata {
-	definition (name: "Enhanced Virtual Fan Controller", namespace: "joelwetzel", author: "Joel Wetzel", description: "A virtual fan controller that also behaves as a switch.") {
+	definition (name: "Enhanced Virtual Fan Controller", namespace: "joelwetzel", author: "Joel Wetzel") {
 		capability "Refresh"
         capability "Actuator"
 		capability "Sensor"
         capability "Switch"
         capability "Switch Level"
 		capability "Fan Control"
-		
+
 		attribute "lastSpeed", "string"
 	}
-    
+
     preferences {
-		section {
-			input (
-				type: "bool",
-				name: "enableDebugLogging",
-				title: "Enable Debug Logging?",
-				required: true,
-				defaultValue: false
-			)
-		}
+        input (
+            type: "bool",
+            name: "enableDebugLogging",
+            title: "Enable Debug Logging?",
+            required: true,
+            defaultValue: false
+        )
 	}
 }
 
@@ -47,10 +45,14 @@ def log (msg) {
 	}
 }
 
+def parse(String description) {
+	def pair = description.split(":")
+	createEvent(name: pair[0].trim(), value: pair[1].trim())
+}
 
 def installed () {
     initialize()
-    
+
 	log.info "${device.displayName}.installed()"
     updated()
 }
@@ -58,14 +60,14 @@ def installed () {
 
 def updated () {
     initialize()
-    
+
 	log.info "${device.displayName}.updated()"
 }
 
 
 def initialize() {
 	log.info "${device.displayName}.initialize()"
-	
+
 	// Default values
 	sendEvent(name: "switch", value: "off", isStateChange: true)
 	sendEvent(name: "level", value: "0", isStateChange: true)
@@ -80,9 +82,9 @@ def refresh() {
 
 def on() {
     log "${device.displayName}.on()"
-	
+
 	def lastSpeed = device.currentValue("lastSpeed")
-    
+
     sendEvent(name: "switch", value: "on", isStateChange: true)
 	sendEvent(name: "speed", value: lastSpeed, isStateChange: true)
 	sendEvent(name: "level", value: convertSpeedToLevel(lastSpeed), isStateChange: true)
@@ -91,7 +93,7 @@ def on() {
 
 def off() {
 	log "${device.displayName}.off()"
-	
+
     sendEvent(name: "switch", value: "off", isStateChange: true)
 	sendEvent(name: "speed", value: "off", isStateChange: true)
 	sendEvent(name: "level", value: 0, isStateChange: true)
@@ -100,15 +102,15 @@ def off() {
 
 def setSpeed(speed) {
 	log "${device.displayName}.setSpeed($speed)"
-	
+
 	def adjustedSpeed = restrictSpeedLevels(speed)						// Only allow certain speed settings.  For example, don't allow "medium-high".
 	def adjustedLevel = convertSpeedToLevel(adjustedSpeed)				// Some fan controllers depend on speed, some depend on level.  Convert the speed to a level.
 	def adjustedSwitch = (adjustedSpeed == "off") ? "off" : "on"		// If speed is "off", then turn off the switch too.
-	
-	// Keep track of the last speed while on.  Then if the fan is off, and 
+
+	// Keep track of the last speed while on.  Then if the fan is off, and
 	// we turn it back on, we can go back to the last on speed.
 	if (adjustedSpeed != "off") {
-		sendEvent(name: "lastSpeed", value: adjustedSpeed, isStateChange: true)		
+		sendEvent(name: "lastSpeed", value: adjustedSpeed, isStateChange: true)
 	}
 
 	sendEvent(name: "switch", value: adjustedSwitch, isStateChange: true)
@@ -120,9 +122,9 @@ def setSpeed(speed) {
 // If our input is level, convert it to a speed input.
 def setLevel(level) {
 	log "${device.displayName}.setLevel($level)"
-	
+
 	def requestedSpeed = convertLevelToSpeed(level)
-	
+
 	setSpeed(requestedSpeed)
 }
 
@@ -187,6 +189,5 @@ def convertLevelToSpeed(level) {
 	}
 	else {
 		return "high"
-	}		
+	}
 }
-
